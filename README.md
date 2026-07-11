@@ -1,4 +1,4 @@
-# bithuman-go
+# bitHuman Go SDK
 
 [![Go CI][go-ci-svg]][go-ci-url]
 [![Go Lint][go-lint-svg]][go-lint-url]
@@ -88,12 +88,12 @@ func main() {
 
 ## Features
 
-- **Agents**: Create, manage, and interact with avatar agents
-- **Sessions**: Real-time conversation sessions with LiveKit integration
-- **TTS**: Text-to-speech synthesis with 30+ language support
-- **Videos**: Generate talking video MP4 files
-- **Files**: Upload images, video, audio, and documents
-- **Webhooks**: Event notifications for async operations
+- 🤖 **Agents**: Create, manage, and interact with avatar agents
+- 📡 **Sessions**: Real-time conversation sessions with LiveKit integration
+- 🗣️ **TTS**: Text-to-speech synthesis with 30+ language support
+- 🎬 **Videos**: Generate talking video MP4 files
+- 📁 **Files**: Upload images, video, audio, and documents
+- 🔔 **Webhooks**: Event notifications for async operations
 
 ## Environment Variables
 
