@@ -127,6 +127,7 @@ func (c *sdkHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("X-BitHuman-SDK-Version", Version)
 	req.Header.Set("X-BitHuman-SDK-Lang", "go")
 
+	// #nosec G704 -- URL is controlled by SDK configuration (BaseURL), not untrusted input
 	return c.client.Do(req)
 }
 
