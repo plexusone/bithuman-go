@@ -76,13 +76,13 @@ func main() {
 
     // Create a real-time session
     session, err := client.Sessions().Create(ctx, &api.CreateSessionRequest{
-        AgentId: "your-agent-id",
+        AgentID: "your-agent-id",
     })
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Printf("Session created: %s\n", session.Id)
-    fmt.Printf("LiveKit URL: %s\n", session.LivekitUrl.Value)
+    fmt.Printf("Session created: %s\n", session.ID)
+    fmt.Printf("LiveKit URL: %s\n", session.LivekitURL.Value)
 }
 ```
 
@@ -141,12 +141,12 @@ bitHuman sessions can connect to LiveKit for real-time WebRTC streaming:
 
 ```go
 session, _ := client.Sessions().Create(ctx, &api.CreateSessionRequest{
-    AgentId:     "your-agent-id",
-    LivekitUrl:  "wss://your-livekit-server",  // Optional external LiveKit
-    LivekitToken: "your-token",                 // Optional external token
+    AgentID:      "your-agent-id",
+    LivekitURL:   api.NewOptString("wss://your-livekit-server"),  // Optional external LiveKit
+    LivekitToken: api.NewOptString("your-token"),                  // Optional external token
 })
 
-// Use session.LivekitUrl and session.LivekitToken to connect
+// Use session.LivekitURL and session.LivekitToken to connect
 ```
 
 ## Development
