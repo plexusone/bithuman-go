@@ -1,0 +1,40 @@
+{
+  "irVersion": "1.0",
+  "project": "bithuman-go",
+  "repository": "https://github.com/plexusone/bithuman-go",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["plexusone", "johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-07-11",
+      "commit": "ffa881a",
+      "highlights": [
+        { "description": "Go SDK for bitHuman Real-Time Avatar Animation API with ogen-generated client and high-level service wrappers" }
+      ],
+      "added": [
+        { "description": "OpenAPI 3.1 specification for bitHuman API (agents, sessions, TTS, videos, files, billing, webhooks)", "commit": "402cf5e" },
+        { "description": "ogen-generated Go API client with typed request/response structs", "commit": "87fa542" },
+        { "description": "High-level SDK client with functional options pattern", "commit": "9e35437" },
+        { "description": "Domain services: Agents, Sessions, TTS, Videos, Files, Billing, Webhooks", "commit": "9e35437" },
+        { "description": "Type-safe method wrappers with proper error handling", "commit": "9e35437" }
+      ],
+      "fixed": [
+        { "description": "Suppress false positive gosec G704 SSRF warning (URL controlled by SDK config)", "commit": "ffa881a" }
+      ],
+      "build": [
+        { "description": "ogen code generation configuration (`ogen.yml`, `generate.sh`)", "commit": "45a7e8a" },
+        { "description": "Standard CI/CD pipelines (go-ci, go-lint, go-sast)", "commit": "7d1d37d" }
+      ],
+      "documentation": [
+        { "description": "README with installation, quick start, and API reference", "commit": "1c92387" },
+        { "description": "MIT License", "commit": "1c92387" },
+        { "description": "Feature icons in README", "commit": "7872840" }
+      ],
+      "dependencies": [
+        { "description": "github.com/ogen-go/ogen v1.23.0", "commit": "5882a47" }
+      ]
+    }
+  ]
+}
