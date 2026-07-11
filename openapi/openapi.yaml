@@ -1,0 +1,878 @@
+openapi: 3.1.0
+info:
+  title: bitHuman API
+  description: |
+    bitHuman Real-Time Avatar Animation API.
+
+    Create digital avatars that lip-sync to audio in real time.
+    Audio in, animated video out at 25 FPS.
+  version: "1.0"
+  contact:
+    name: bitHuman
+    url: https://www.bithuman.ai
+  license:
+    name: Proprietary
+    url: https://www.bithuman.ai/terms
+
+servers:
+  - url: https://api.bithuman.ai
+    description: Production API
+
+security:
+  - apiSecret: []
+
+tags:
+  - name: Agents
+    description: Generate, retrieve, update, and manage avatar agents
+  - name: Sessions
+    description: Real-time conversation sessions with agents
+  - name: TTS
+    description: Text-to-speech synthesis
+  - name: Video
+    description: Generate talking video files
+  - name: Files
+    description: Upload images, video, audio, and documents
+  - name: Billing
+    description: Account balance and usage
+  - name: Webhooks
+    description: Event notification endpoints
+
+paths:
+  /v1/validate:
+    post:
+      operationId: validate
+      summary: Validate API credentials
+      description: Cheapest way to verify API key is valid
+      tags: [Agents]
+      responses:
+        "200":
+          description: Credentials are valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidateResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/agents:
+    get:
+      operationId: listAgents
+      summary: List all agents
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      operationId: createAgent
+      summary: Generate a new avatar agent
+      description: |
+        Generate a new avatar agent from a text prompt with optional image/audio.
+        Returns immediately with agent ID; use GET /v1/agents/{id} to poll status.
+      tags: [Agents]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgentRequest"
+      responses:
+        "201":
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/agents/{agentId}:
+    get:
+      operationId: getAgent
+      summary: Get agent details
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/AgentId"
+      responses:
+        "200":
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    patch:
+      operationId: updateAgent
+      summary: Update agent
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/AgentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgentRequest"
+      responses:
+        "200":
+          description: Agent updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      operationId: deleteAgent
+      summary: Delete agent
+      tags: [Agents]
+      parameters:
+        - $ref: "#/components/parameters/AgentId"
+      responses:
+        "204":
+          description: Agent deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/agents/{agentId}/speak:
+    post:
+      operationId: speak
+      summary: Make agent speak
+      description: Send text for the agent to speak with lip-sync
+      tags: [Sessions]
+      parameters:
+        - $ref: "#/components/parameters/AgentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpeakRequest"
+      responses:
+        "200":
+          description: Speech initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeakResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/sessions:
+    post:
+      operationId: createSession
+      summary: Create a real-time session
+      description: |
+        Create a new real-time conversation session with an agent.
+        Returns connection details for WebRTC/LiveKit.
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/sessions/{sessionId}:
+    get:
+      operationId: getSession
+      summary: Get session details
+      tags: [Sessions]
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      operationId: endSession
+      summary: End a session
+      tags: [Sessions]
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "204":
+          description: Session ended
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/tts:
+    post:
+      operationId: textToSpeech
+      summary: Text to speech
+      description: Convert text to audio using bitHuman TTS
+      tags: [TTS]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TTSRequest"
+      responses:
+        "200":
+          description: Audio data
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/voices:
+    get:
+      operationId: listVoices
+      summary: List available voices
+      tags: [TTS]
+      responses:
+        "200":
+          description: List of voices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VoiceList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/videos:
+    post:
+      operationId: createVideo
+      summary: Generate talking video
+      description: |
+        Generate an MP4 talking video from text or audio.
+        This is an async operation; poll GET /v1/videos/{id} for status.
+      tags: [Video]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVideoRequest"
+      responses:
+        "201":
+          description: Video job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoJob"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/videos/{videoId}:
+    get:
+      operationId: getVideo
+      summary: Get video job status
+      tags: [Video]
+      parameters:
+        - $ref: "#/components/parameters/VideoId"
+      responses:
+        "200":
+          description: Video job details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoJob"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/files:
+    post:
+      operationId: uploadFile
+      summary: Upload a file
+      description: Upload images, video, audio, or documents
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadFileRequest"
+      responses:
+        "201":
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/File"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/billing/balance:
+    get:
+      operationId: getBalance
+      summary: Get account balance
+      tags: [Billing]
+      responses:
+        "200":
+          description: Account balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Balance"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/embed/token:
+    post:
+      operationId: createEmbedToken
+      summary: Create embed token
+      description: Mint a short-lived JWT for embedding avatar in websites
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmbedTokenRequest"
+      responses:
+        "201":
+          description: Embed token created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmbedToken"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/webhooks:
+    get:
+      operationId: listWebhooks
+      summary: List webhooks
+      tags: [Webhooks]
+      responses:
+        "200":
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      operationId: createWebhook
+      summary: Create webhook
+      tags: [Webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookRequest"
+      responses:
+        "201":
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/webhooks/{webhookId}:
+    delete:
+      operationId: deleteWebhook
+      summary: Delete webhook
+      tags: [Webhooks]
+      parameters:
+        - $ref: "#/components/parameters/WebhookId"
+      responses:
+        "204":
+          description: Webhook deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    apiSecret:
+      type: apiKey
+      in: header
+      name: api-secret
+      description: API secret key from Developer → API Keys
+
+  parameters:
+    AgentId:
+      name: agentId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Agent ID
+
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Session ID
+
+    VideoId:
+      name: videoId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Video job ID
+
+    WebhookId:
+      name: webhookId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Webhook ID
+
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 20
+        maximum: 100
+      description: Maximum number of items to return
+
+    Offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        default: 0
+      description: Number of items to skip
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+
+    ValidateResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        account_id:
+          type: string
+
+    Agent:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          description: Unique agent identifier
+        name:
+          type: string
+          description: Agent display name
+        status:
+          type: string
+          enum: [pending, processing, ready, failed]
+          description: Agent generation status
+        prompt:
+          type: string
+          description: Agent personality prompt
+        model_type:
+          type: string
+          enum: [essence, expression]
+          description: Avatar model type
+        portrait_url:
+          type: string
+          format: uri
+          description: Agent portrait image URL
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AgentList:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Agent"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateAgentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Agent display name
+        prompt:
+          type: string
+          description: Agent personality prompt
+        portrait_url:
+          type: string
+          format: uri
+          description: Portrait image URL
+        portrait_base64:
+          type: string
+          description: Portrait image as base64
+        model_type:
+          type: string
+          enum: [essence, expression]
+          default: essence
+          description: Avatar model type
+
+    UpdateAgentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        prompt:
+          type: string
+
+    Session:
+      type: object
+      required:
+        - id
+        - agent_id
+        - status
+      properties:
+        id:
+          type: string
+          description: Session ID
+        agent_id:
+          type: string
+          description: Agent ID
+        status:
+          type: string
+          enum: [active, ended]
+        livekit_url:
+          type: string
+          description: LiveKit WebSocket URL
+        livekit_token:
+          type: string
+          description: LiveKit JWT token
+        created_at:
+          type: string
+          format: date-time
+
+    CreateSessionRequest:
+      type: object
+      required:
+        - agent_id
+      properties:
+        agent_id:
+          type: string
+          description: Agent to use for this session
+        livekit_url:
+          type: string
+          description: Optional external LiveKit URL
+        livekit_token:
+          type: string
+          description: Optional external LiveKit token
+
+    SpeakRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: Text for the agent to speak
+        voice_id:
+          type: string
+          description: Voice to use (optional)
+
+    SpeakResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        duration_ms:
+          type: integer
+          description: Estimated speech duration
+
+    TTSRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: Text to synthesize
+        voice_id:
+          type: string
+          description: Voice ID (M1-M5, F1-F5)
+          default: M1
+        language:
+          type: string
+          description: Language code (e.g., en, es, fr)
+          default: en
+
+    VoiceList:
+      type: object
+      properties:
+        voices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Voice"
+
+    Voice:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        gender:
+          type: string
+          enum: [male, female]
+        language:
+          type: string
+        preview_url:
+          type: string
+          format: uri
+
+    CreateVideoRequest:
+      type: object
+      required:
+        - agent_id
+      properties:
+        agent_id:
+          type: string
+          description: Agent ID
+        text:
+          type: string
+          description: Script text (mutually exclusive with audio_url)
+        audio_url:
+          type: string
+          format: uri
+          description: Audio URL (mutually exclusive with text)
+        voice_id:
+          type: string
+          description: Voice ID for TTS (when using text)
+
+    VideoJob:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+        agent_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        video_url:
+          type: string
+          format: uri
+          description: Download URL (when completed)
+        duration_seconds:
+          type: number
+        error:
+          type: string
+          description: Error message (when failed)
+        created_at:
+          type: string
+          format: date-time
+
+    UploadFileRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL to download file from
+        base64:
+          type: string
+          description: File content as base64
+        filename:
+          type: string
+          description: Original filename
+        content_type:
+          type: string
+          description: MIME type
+
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        content_type:
+          type: string
+        size_bytes:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    Balance:
+      type: object
+      properties:
+        credits:
+          type: number
+          description: Available credits
+        minutes_estimate:
+          type: object
+          properties:
+            essence:
+              type: number
+            expression:
+              type: number
+          description: Estimated minutes by model type
+
+    CreateEmbedTokenRequest:
+      type: object
+      required:
+        - agent_id
+      properties:
+        agent_id:
+          type: string
+        ttl_seconds:
+          type: integer
+          default: 3600
+          description: Token time-to-live
+
+    EmbedToken:
+      type: object
+      properties:
+        token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum: [agent.ready, agent.failed]
+        secret:
+          type: string
+          description: Signing secret
+        created_at:
+          type: string
+          format: date-time
+
+    WebhookList:
+      type: object
+      properties:
+        webhooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Webhook"
+
+    CreateWebhookRequest:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum: [agent.ready, agent.failed]
