@@ -94,6 +94,7 @@ func main() {
 - 🎬 **Videos**: Generate talking video MP4 files
 - 📁 **Files**: Upload images, video, audio, and documents
 - 🔔 **Webhooks**: Event notifications for async operations
+- 🔌 **OmniAvatar Adapter**: Use bitHuman render behind the provider-agnostic [OmniAvatar](https://github.com/plexusone/omniavatar) interfaces
 
 ## Environment Variables
 
