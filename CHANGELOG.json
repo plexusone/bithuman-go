@@ -7,6 +7,19 @@
   "maintainers": ["plexusone", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.2.0",
+      "date": "2026-07-19",
+      "highlights": [
+        { "description": "OmniAvatar render adapter: use bitHuman video generation behind the provider-agnostic OmniAvatar interfaces" }
+      ],
+      "added": [
+        { "description": "`omniavatar` subpackage: an OmniAvatar render adapter implementing the omniavatar-core render interfaces (`render.Provider`, `render.AudioUploader`) on top of this SDK; depends only on omniavatar-core", "commit": "9fefce4" }
+      ],
+      "documentation": [
+        { "description": "README OmniAvatar Integration section" }
+      ]
+    },
+    {
       "version": "v0.1.0",
       "date": "2026-07-11",
       "commit": "ffa881a",
