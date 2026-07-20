@@ -13,10 +13,14 @@
         { "description": "OmniAvatar render adapter: use bitHuman video generation behind the provider-agnostic OmniAvatar interfaces" }
       ],
       "added": [
-        { "description": "`omniavatar` subpackage: an OmniAvatar render adapter implementing the omniavatar-core render interfaces (`render.Provider`, `render.AudioUploader`) on top of this SDK; depends only on omniavatar-core", "commit": "9fefce4" }
+        { "description": "`omniavatar` subpackage: an OmniAvatar render adapter implementing the omniavatar-core render interfaces (`render.Provider`, `render.AudioUploader` via the file API) on top of this SDK; depends only on omniavatar-core", "commit": "9fefce4" }
+      ],
+      "dependencies": [
+        { "description": "Require `omniavatar-core` v0.3.0 for the render adapter", "commit": "44bd41e" },
+        { "description": "Update indirect dependencies", "commit": "dcce039" }
       ],
       "documentation": [
-        { "description": "README OmniAvatar Integration section" }
+        { "description": "README OmniAvatar Integration section and feature-list entry", "commit": "1fe2d0d" }
       ]
     },
     {
