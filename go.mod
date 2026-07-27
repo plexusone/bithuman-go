@@ -3,7 +3,7 @@ module github.com/plexusone/bithuman-go
 go 1.25.0
 
 require (
-	github.com/go-faster/errors v0.7.1
+	github.com/go-faster/errors v0.8.0
 	github.com/go-faster/jx v1.2.0
 	github.com/ogen-go/ogen v1.23.0
 	go.opentelemetry.io/otel v1.44.0
